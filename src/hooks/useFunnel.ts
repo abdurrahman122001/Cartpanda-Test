@@ -13,6 +13,7 @@ import {
     EdgeChange,
     Node,
     NodeChange,
+    reconnectEdge,
 } from '@xyflow/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -77,7 +78,7 @@ function applyWarningToNodes(nodes: Node[], edges: Edge[]): Node[] {
         hasWarning,
         warningMessage: hasWarning
           ? outgoing.length === 0
-            ? 'No connection'
+            ? 'No connection — connect to next step'
             : 'Multiple connections'
           : undefined,
       },
@@ -128,6 +129,19 @@ export function useFunnel() {
     }
     setEdges((prev) => addEdge({ ...conn, type: 'smoothstep' }, prev));
   }, [nodes]);
+
+  const onReconnect = useCallback(
+    (oldEdge: Edge, newConnection: Connection) => {
+      const sourceNode = nodes.find((node) => node.id === newConnection.source);
+      const sourceData = sourceNode?.data as FunnelNodeData | undefined;
+      if (sourceData?.type === 'thankyou') {
+        toast.error("Thank You steps can't have outgoing connections");
+        return;
+      }
+      setEdges((prev) => reconnectEdge(oldEdge, newConnection, prev));
+    },
+    [nodes]
+  );
 
   const addNode = useCallback((type: NodeType, position: { x: number; y: number }) => {
     const index = getNextIndex(nodes, type);
@@ -255,6 +269,7 @@ export function useFunnel() {
     onNodesChange,
     onEdgesChange,
     onConnect,
+    onReconnect,
     addNode,
     exportFunnel,
     importFunnel,

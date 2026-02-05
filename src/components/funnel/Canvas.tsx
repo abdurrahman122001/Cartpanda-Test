@@ -43,7 +43,7 @@ function EmptyState({ onLoadExample }: { onLoadExample: () => void }) {
     <div className="absolute inset-0 flex items-center justify-center z-[1] pointer-events-none" aria-hidden="true">
       <div className="flex flex-col items-center gap-4 text-center px-6 pointer-events-auto">
         <p className="text-sm text-muted-foreground max-w-[280px]">
-          Drag steps from the left onto the canvas. Drop a step on top of another to connect them, or use the handles.
+          Drag steps from the left onto the canvas. Drop a step on top of another to connect them, or use the handles. Click a connection and press Delete to remove it; drag an edge end to another step to reconnect.
         </p>
         <Button type="button" variant="secondary" size="sm" onClick={onLoadExample} className="pointer-events-auto">
           Start from example order flow
@@ -134,12 +134,16 @@ function CanvasInner() {
           onNodesChange={state.onNodesChange}
           onEdgesChange={state.onEdgesChange}
           onConnect={state.onConnect}
+          onReconnect={state.onReconnect}
+          edgesReconnectable
+          reconnectRadius={12}
+          nodesDraggable
           onDragOver={onDragOver}
           onDrop={onDrop}
           onNodeDragStart={onNodeDragStart}
           onNodeDragStop={onNodeDragStop}
           nodeTypes={nodeTypes}
-          defaultEdgeOptions={{ type: 'smoothstep' }}
+          defaultEdgeOptions={{ type: 'smoothstep', reconnectable: 'target' }}
           fitView
           fitViewOptions={{ padding: 0.2 }}
           className="canvas-wrapper"
